@@ -8,6 +8,8 @@ import{toast} from "react-hot-toast";
 const CreateUpdateFrom = () => {
      let { postId } = useParams();
     const navigate = useNavigate();
+    const [authenticated, setAuthenticated] = useState(false);
+
 
 
     const [formData, setFormData] = useState({
@@ -19,8 +21,16 @@ const CreateUpdateFrom = () => {
     let [Data, setData] = useState(false);
 
     useEffect(() => {
+
+        const token = localStorage.getItem('authorization');
+        if (token) {
+            setAuthenticated(true); // Set authenticated to true if token exists
+        } else {
+            setAuthenticated(false);
+        }
+
         (async () => {
-            let res = await axios.get("https://blogapiew.onrender.com/api/v1/blogsGetID/"+postId);
+            let res = await axios.get("https://blogapi-mt4q.onrender.com/api/v1/blogsGetID/"+postId);
             setFormData(res.data['data']);
             setData(true);
 
@@ -29,16 +39,16 @@ const CreateUpdateFrom = () => {
 
 
 
-
     const inputonChange = (property, value) => {
         setFormData({ ...formData, [property]: value });
     };
 
     const onSubmit = async () => {
-        let URL = "https://blogapiew.onrender.com/api/v1/blogPost";
+
+        let URL = "https://blogapi-mt4q.onrender.com/api/v1/blogPost";
 
         if(postId){
-            URL = `https://blogapiew.onrender.com/api/v1/blogsUpdate/${postId}`;
+            URL = `https://blogapi-mt4q.onrender.com/api/v1/blogsUpdate/${postId}`;
         }
         const res = await axios.post(
             URL,
@@ -53,6 +63,7 @@ const CreateUpdateFrom = () => {
     };
 
     return (
+        authenticated && localStorage.getItem("role") === "admin" ? (
         <div className="container mt-4">
             <input
                 value={formData.title}
@@ -80,8 +91,17 @@ const CreateUpdateFrom = () => {
                 Submit
             </button>
 
-
         </div>
+        ) : (
+
+            <div className="container">
+                <div className="row">
+                    <div className="col-md-12 card">
+                        <h1 className="text-center">You are not authorized to access this page</h1>
+                    </div>
+                </div>
+            </div>
+        )
     );
 };
 

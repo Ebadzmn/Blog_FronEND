@@ -12,6 +12,8 @@ import SinglePage from "./pages/SinglePage.jsx";
 
 import {Toaster} from "react-hot-toast";
 import UpdatePage from "./pages/UpdatePage.jsx";
+import Registration from "./pages/auth/Registration.jsx";
+import Login from "./pages/auth/Login.jsx";
 
 const App = () => {
     return (
@@ -25,6 +27,8 @@ const App = () => {
                     <Route path="/" element={<ReadPage/>}></Route>
                     <Route path="/post/:postId" element={<SinglePage/>}></Route>
                     <Route path={"/update/:postId"} element={<UpdatePage/>}></Route>
+                    <Route path={"/register"} element={<Registration/>}></Route>
+                    <Route path={"/login"} element={<Login/>}></Route>
 
 
 

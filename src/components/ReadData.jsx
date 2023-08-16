@@ -4,22 +4,46 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import {toast} from "react-hot-toast";
 import Loader from "../helper/Loader.jsx";
+import { useNavigate } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
+import {getItem} from "localforage";
 
 const ReadData = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [authenticated, setAuthenticated] = useState(false);
+    const [authChecked, setAuthChecked] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
-        fetchData();
+        const token = localStorage.getItem('authorization');
+        if (token) {
+            setAuthenticated(true);
+            fetchData();
+        }
+
+        else {
+            setAuthenticated(false);
+        }
+        setAuthChecked(true);
+
+
+
+
+
     }, []);
 
-    const fetchData = async () => {
+
+
+
+
+const fetchData = async () => {
         try {
-            const res = await axios.get('https://blogapiew.onrender.com/api/v1/blogsGet');
+            const res = await axios.get('https://blogapi-mt4q.onrender.com/api/v1/blogsGet');
             if (res.status === 200) {
                 setData(res.data['data']);
             } else {
@@ -34,7 +58,7 @@ const ReadData = () => {
 
     const handleDelete = async (itemId) => {
         try {
-            const res = await axios.delete(`https://blogapiew.onrender.com/api/v1/blogsDelete/${itemId}`);
+            const res = await axios.delete(`https://blogapi-mt4q.onrender.com/api/v1/blogsDelete/${itemId}`);
             if (res.status === 200) {
                 toast.success("Success Delete");
                 // Update the data after successful deletion
@@ -47,8 +71,24 @@ const ReadData = () => {
         }
     };
 
-    if (loading) {
+
+
+
+
+    if (!authChecked) {
         return <div> <Loader/></div>;
+    }
+
+
+
+    if (!authenticated) {
+       navigate('/login'); // If not authenticated, redirect to login page
+    }
+
+
+
+    if (loading) {
+        return <div> <Loader /></div>;
     }
 
     if (error) {
@@ -72,15 +112,21 @@ const ReadData = () => {
                                     <Link to={`/post/${item._id}`} className="btn bg-body-tertiary">
                                         Read More
                                     </Link>
-                                    <button
-                                        className="btn btn-danger "
-                                        onClick={() => handleDelete(item._id)}
-                                    >
-                                        Delete
-                                    </button>
-                                    <button>
-                                        <Link to={"/update/"+item['_id']} className='btn btn-dark'>Edit</Link>
-                                    </button>
+                                    {authenticated && localStorage.getItem('role') === 'admin' && (
+                                        <>
+                                            <button
+                                                className="btn btn-danger"
+                                                onClick={() => handleDelete(item._id)}
+                                            >
+                                                Delete
+                                            </button>
+                                            <button>
+                                                <Link to={`/update/${item._id}`} className="btn btn-dark">
+                                                    Edit
+                                                </Link>
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
